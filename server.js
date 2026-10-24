@@ -2,31 +2,34 @@ const express = require('express');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware to parse JSON payloads
+// Middleware to parse JSON
 app.use(express.json());
 
-// API Endpoint for Account Creation
+// Main API Route
 app.post('/api/accounts/create', (req, res) => {
-    const { email, username, orgCode } = req.body;
+    try {
+        const body = req.body || {};
+        const email = body.email || "testuser@gmail.com";
+        const username = body.username || "abir123";
+        const orgCode = body.orgCode || body.org_code || body.code || "12345";
 
-    // Receive orgCode from request or generate fallback
-    const finalOrgCode = orgCode || req.body.org_code || req.body.code || "12345";
-
-    // Send full JSON response including orgCode
-    return res.status(200).json({
-        success: true,
-        message: "Account successfully processed with US routing.",
-        data: {
-            email: email || "testuser@gmail.com",
-            username: username || "abir123",
-            orgCode: finalOrgCode
-        }
-    });
+        return res.status(200).json({
+            success: true,
+            message: "Account successfully processed with US routing.",
+            data: {
+                email: email,
+                username: username,
+                orgCode: orgCode
+            }
+        });
+    } catch (error) {
+        return res.status(500).json({ success: false, error: error.message });
+    }
 });
 
-// Health check endpoint
+// Root check
 app.get('/', (req, res) => {
-    res.send("Muse.ai API Backend is running!");
+    res.send("Server is Live!");
 });
 
 app.listen(PORT, () => {
