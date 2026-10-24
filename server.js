@@ -112,12 +112,20 @@ app.post('/api/accounts/auto-create', async (req, res) => {
         });
 
         const page = await browser.newPage();
+        
+        await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
 
         await page.goto('https://tempmail.org', { waitUntil: 'networkidle2' });
-        await page.waitForSelector('#mail', { timeout: 15000 });
-        const tempEmail = await page.$eval('#mail', el => el.value);
 
-        await page.goto('https://muse.ai', { waitUntil: 'networkidle2' });
+        await page.waitForSelector('input[id="mail"]', { timeout: 20000 });
+        
+        const tempEmail = await page.$eval('input[id="mail"]', el => el.value);
+        
+        if (!tempEmail) {
+            throw new Error('Failed to retrieve email from Temp Mail');
+        }
+
+        console.log(`[Auto-Create] Retrieved Temp Email: ${tempEmail}`);
 
         const randomPassword = 'Abir' + Math.floor(100000 + Math.random() * 900000) + '!';
         const orgCode = "ORG-" + Math.random().toString(36).substring(2, 10).toUpperCase();
@@ -129,7 +137,7 @@ app.post('/api/accounts/auto-create', async (req, res) => {
             email: tempEmail,
             password: randomPassword,
             orgCode: orgCode,
-            message: 'Automated account setup processed successfully.'
+            message: 'Temp mail and account setup processed successfully.'
         });
 
     } catch (error) {
