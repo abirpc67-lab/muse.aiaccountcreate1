@@ -1,11 +1,10 @@
-const express = require('express');
+import express from 'express';
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware to parse JSON
 app.use(express.json());
 
-// Main API Route
 app.post('/api/accounts/create', (req, res) => {
     try {
         const body = req.body || {};
@@ -27,7 +26,6 @@ app.post('/api/accounts/create', (req, res) => {
     }
 });
 
-// Root check
 app.get('/', (req, res) => {
     res.send("Server is Live!");
 });
